@@ -61,8 +61,11 @@ fn player_movement(
         } else if keyboard_input.pressed(KeyCode::Right){
             1.
         } else { 0.};
-        
+        let w_span = win_size.w / 2. -50.;
+
         transform.translation.x += dir * speed.0 * time.delta_seconds();
+
+        transform.translation.x = transform.translation.x.clamp(-w_span, w_span);        
     }
 }
 
