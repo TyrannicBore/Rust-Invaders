@@ -1,8 +1,38 @@
 use bevy::{core::FixedTimestep, prelude::*};
 
-use crate::{FromPlayer, Laser, Materials, Player, PlayerReadyFire, PlayerState, RESPAWN_DELAY, Speed, TIME_STEP, WinSize};
+use crate::{Laser, Materials,RESPAWN_DELAY, Speed, TIME_STEP, WinSize};
 
 pub struct PlayerPlugin;
+
+pub struct Player;
+pub struct PlayerReadyFire(bool);
+pub struct FromPlayer;
+
+pub struct PlayerState{
+    on: bool,
+    last_shot: f64
+}
+impl Default for PlayerState{
+    fn default()->Self{
+        Self{
+            on: false,
+            last_shot: 0.
+        }
+    }
+}
+impl PlayerState{
+    pub fn shot(&mut self, time:f64){
+        self.on = false;
+        self.last_shot = time;
+    }
+    fn spawned(&mut self){
+        self.on =true;
+        self.last_shot = 0.;
+    }
+    pub fn get_state(&self)->bool{
+        self.on
+    }
+}
 
 impl Plugin for PlayerPlugin{
     fn build(&self, app: &mut AppBuilder){

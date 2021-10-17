@@ -3,7 +3,7 @@ use std::f32::consts::PI;
 use bevy::{core::FixedTimestep, prelude::*};
 use rand::{Rng, thread_rng};
 
-use crate::{ActiveEnemies, Enemy, FromEnemy, Laser, MAX_FORMATION_MEMBERS, Materials, Speed, TIME_STEP, WinSize};
+use crate::{ActiveEnemies, Enemy, FromEnemy, Laser, MAX_FORMATION_MEMBERS, Materials, Speed, TIME_STEP, WinSize, player::{Player, PlayerState}};
 
 pub struct EnemyPlugin;
 #[derive(Default,Clone)]
@@ -87,8 +87,7 @@ fn enemy_spawn(
                 material: materials.enemy.clone(),
                 transform: Transform{
                     translation: Vec3::new(x,y,10.),
-                    scale: Vec3::new(0.25,0.25, -1.), 
-                    rotation: Quat::from_rotation_y(std::f32::consts::PI),
+                    scale: Vec3::new(0.25,-0.25, -1.),
                     ..Default::default()
                 },
                 ..Default::default()
@@ -102,27 +101,30 @@ fn enemy_spawn(
 fn enemy_fire(
     mut commands: Commands,
     materials: Res<Materials>,
-    enemy_query: Query<&Transform, With<Enemy>>
+    enemy_query: Query<(&Transform), (With<Enemy>)>,
+    player_query: Query<(Entity),(With<Player>)>
 ){
-    for &enemy_t in enemy_query.iter(){
-        let x = enemy_t.translation.x;
-        let y = enemy_t.translation.y;
-
-        commands
-            .spawn_bundle(
-                SpriteBundle{
-                    material: materials.e_laser.clone(),
-                    transform: Transform{
-                        translation: Vec3:: new(x,y - 15., 0.),
-                        scale: Vec3::new(0.5, 0.5, 1.),
+    if let Ok((player_e)) = player_query.single(){
+        for (&enemy_t) in enemy_query.iter(){
+                let x = enemy_t.translation.x;
+                let y = enemy_t.translation.y;
+                
+                commands
+                .spawn_bundle(
+                    SpriteBundle{
+                        material: materials.e_laser.clone(),
+                        transform: Transform{
+                            translation: Vec3:: new(x,y - 15., 0.),
+                            scale: Vec3::new(0.5, 0.5, 1.),
+                            ..Default::default()
+                        },
                         ..Default::default()
-                    },
-                    ..Default::default()
-                }
-            )
-            .insert(Laser)
-            .insert(FromEnemy)
-            .insert(Speed::default());
+                    }
+                )
+                .insert(Laser)
+                .insert(FromEnemy)
+                .insert(Speed::default());
+        }
     }
 }
 fn enemy_laser_movement(

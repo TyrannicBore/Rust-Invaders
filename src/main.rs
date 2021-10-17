@@ -4,7 +4,7 @@ mod player;
 mod enemy;
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 use enemy::EnemyPlugin;
-use player::PlayerPlugin;
+use player::{FromPlayer, Player, PlayerPlugin, PlayerState};
 
 const PLAYER_SPRITE: &str = "player.png";
 const P_LASER_SPRITE: &str = "bluebeam.png";
@@ -30,34 +30,10 @@ struct WinSize{
 }
 
 struct ActiveEnemies(u32);
-struct PlayerState{
-    on: bool,
-    last_shot: f64
-}
-impl Default for PlayerState{
-    fn default()->Self{
-        Self{
-            on: false,
-            last_shot: 0.
-        }
-    }
-}
-impl PlayerState{
-    fn shot(&mut self, time:f64){
-        self.on = false;
-        self.last_shot = time;
-    }
-    fn spawned(&mut self){
-        self.on =true;
-        self.last_shot = 0.;
-    }
-}
+
 //endregion: Resources
 
 //region: Components
-struct Player;
-struct PlayerReadyFire(bool);
-struct FromPlayer;
 
 struct Laser;
 struct Enemy;
